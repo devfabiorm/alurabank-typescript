@@ -14,7 +14,10 @@ class NegociacaoController{
 
         event.preventDefault();
 
-        const negociacao = new Negociacao(this._inputData, this._inputQuantidade, this._inputValor);
+        const negociacao = new Negociacao(
+            new Date(this._inputData.value.replace(/-/g, ',')),
+            parseInt(this._inputQuantidade.value),
+            parseFloat(this._inputValor.value));
 
         console.log(negociacao);
     }
