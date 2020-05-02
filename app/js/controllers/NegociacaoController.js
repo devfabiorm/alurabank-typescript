@@ -47,13 +47,12 @@ System.register(["../models/index", "../views/index", "../helpers/decorators/ind
                     return data.getDay() != DiaDaSemana.Domingo && data.getDay() != DiaDaSemana.Sabado;
                 }
                 importa() {
-                    function isOk(res) {
+                    this._service.obterNegociacoes(res => {
                         if (!res.ok) {
                             throw new Error(res.statusText);
                         }
                         return res;
-                    }
-                    this._service.obterNegociacoes(isOk)
+                    })
                         .then((negociacoes) => {
                         negociacoes
                             .forEach(negociacao => this._negociacoes.adiciona(negociacao));
