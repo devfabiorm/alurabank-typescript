@@ -43,6 +43,22 @@ System.register(["../models/index", "../views/index", "../helpers/decorators/ind
                 _ehDiaUtil(data) {
                     return data.getDay() != DiaDaSemana.Domingo && data.getDay() != DiaDaSemana.Sabado;
                 }
+                importa() {
+                    function isOk(res) {
+                        if (!res.ok) {
+                            throw new Error(res.statusText);
+                        }
+                        return res;
+                    }
+                    fetch('http://localhost:8080/dados')
+                        .then(res => isOk(res))
+                        .then(res => res.json())
+                        .then((dados) => {
+                        dados.map(dado => new index_1.Negociacao(new Date, dado.vezes, dado.montante))
+                            .forEach(negociacao => this._negociacoes.adiciona(negociacao));
+                        this._negociacoesView.update(this._negociacoes);
+                    });
+                }
             };
             __decorate([
                 index_3.domInject('#data')
