@@ -15,7 +15,7 @@ export class NegociacaoController {
 
     @domInject('#valor')
     private _inputValor: JQuery;
-    
+
     private _negociacoes = new Negociacoes();
     private _negociacoesView = new NegociacoesView('#negociacoesView');
     private _mensagemView = new MensagemView('#mensagemView');
@@ -30,7 +30,7 @@ export class NegociacaoController {
 
         let data = new Date(this._inputData.val().replace(/-/g, ','));
 
-        if(!this._ehDiaUtil(data)){
+        if (!this._ehDiaUtil(data)) {
             this._mensagemView.update('Negociações somente em dias úteis, por favor!');
             return;
         }
@@ -41,37 +41,47 @@ export class NegociacaoController {
             parseFloat(this._inputValor.val()));
 
         this._negociacoes.adiciona(negociacao);
-        
+
         imprime(negociacao, this._negociacoes);
         this._negociacoesView.update(this._negociacoes);
         this._mensagemView.update('Negociação cadastrada com sucesso!');
     }
 
-    private _ehDiaUtil(data: Date) : boolean {
+    private _ehDiaUtil(data: Date): boolean {
 
         return data.getDay() != DiaDaSemana.Domingo && data.getDay() != DiaDaSemana.Sabado;
     }
 
     @throttle()
-    importa(){
+    async importa() {
+        try {
 
-        this._service.obterNegociacoes(res => {
-            if(!res.ok){
-                throw new Error(res.statusText)
+            const negociacoesParaImportar = await this._service.obterNegociacoes(res => {
+                if (!res.ok) {
+                    throw new Error(res.statusText)
+                }
+
+                return res;
+            });
+
+
+            const negociacoesJaImportadas = this._negociacoes.paraArray();
+
+            if (typeof (negociacoesParaImportar) === typeof (this._negociacoes.paraArray())) {
+
+                let array = negociacoesParaImportar as Negociacao[];
+
+                array
+                    .filter((negociacao: Negociacao) => !negociacoesJaImportadas.some(jaImportada => negociacao.ehIgual(jaImportada)))
+                    .forEach((negociacao: Negociacao) => this._negociacoes.adiciona(negociacao));
+                this._negociacoesView.update(this._negociacoes);
+                this._mensagemView.update('Negociações importadas com sucesso');
             }
 
-            return res;
-        })
-            .then((negociacoesParaImportar: Negociacao[]) => { 
-            
-                const negociacoesJaImportadas = this._negociacoes.paraArray();
-
-            negociacoesParaImportar
-                .filter(negociacao => !negociacoesJaImportadas.some(jaImportada => negociacao.ehIgual(jaImportada)))
-                .forEach(negociacao => this._negociacoes.adiciona(negociacao));
-            
-                this._negociacoesView.update(this._negociacoes);
-            })
+        }
+        catch (erro) {
+            this._mensagemView.update(erro.message);
+        }
 
     }
 }
