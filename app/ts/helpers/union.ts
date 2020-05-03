@@ -1,4 +1,7 @@
-function processaToken(token: string | number) {
+// criando o alias!
+type MeuToken = string |  number;
+
+function processaToken(token: MeuToken) {
 
     if(typeof(token) === 'string'){
         // typescript entende que é o tipo string e faz autocomplete para este tipo. A função replace só existe em string
