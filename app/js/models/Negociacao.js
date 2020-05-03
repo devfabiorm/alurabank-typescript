@@ -24,6 +24,9 @@ System.register([], function (exports_1, context_1) {
         `);
                     console.log('----------------------');
                 }
+                ehIgual(negociacao) {
+                    return negociacao.data.getDate() == this.data.getDate() && negociacao.data.getMonth() == this.data.getMonth() && negociacao.data.getFullYear() == this.data.getFullYear();
+                }
             };
             exports_1("Negociacao", Negociacao);
         }
